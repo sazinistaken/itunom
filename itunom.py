@@ -5,6 +5,7 @@ import queue
 
 DEGREE_SYMBOL = '\u00B0'
 
+# Global queue for storing vehicle position
 position_queue = queue.Queue()
 
 class Vehicle():
@@ -18,9 +19,7 @@ class Vehicle():
 
 
     def update_position(self, t):
-
         radian_direciton = math.radians(self.direction)
-
         self.x = self.x + self.velocity * math.cos(radian_direciton) * t
         self.y = self.y + self.velocity * math.sin(radian_direciton) * t
 
@@ -29,24 +28,25 @@ class Vehicle():
         self.altidute += delta_altidute
 
 
+# Send current position to the queue
     def get_position(self):
         position = self.name, self.x, self.y, self.velocity, self.direction, self.altidute
         position_queue.put(position)
     
 
-
-class Quadcopter (Vehicle):
+class Quadcopter(Vehicle):
     def  __init__(self,name, x, y, velocity, direction, altitude):
         super().__init__(name, x, y, velocity, direction, altitude)
 
     
 
-class Drone (Vehicle):
+class Drone(Vehicle):
     def __init__(self, name, x, y, velocity, direction, altitude):
         super().__init__(name, x, y, velocity, direction, altitude)
 
 
-class VehicleThread (threading.Thread):
+# Thread that updates vehicle's position
+class VehicleThread(threading.Thread):
     def __init__(self, vehicle, frequency=1.0):
         super().__init__()
         self.vehicle = vehicle
@@ -89,10 +89,11 @@ def main():
 
     log_thread =  PositionLogThread()
 
-    drone_thread.start()
     quadcopter_thread.start()
+    drone_thread.start()
     log_thread.start()
-    
+
+# Let threads run for 5 sec
     time.sleep(5.0)
 
     quadcopter_thread.stop()
